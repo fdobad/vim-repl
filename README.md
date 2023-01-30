@@ -1,5 +1,48 @@
-[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://vshymanskyy.github.io/StandWithUkraine)
+# Bug fix
+- The variable `repl_python_pre_launch_command` wasn't working to preload an environment
+- Minor fix of `EndWith` function to not use `pythonx` because I can't acess it in windows
+- Tested on windows 10
 
+
+- Put it on `opt` plugin directory
+- This is my `vimrc` config/reminder
+
+```
+" Vim-REPL {{{2
+function VimRepl()
+	packadd vim-repl
+	" https://github.com/sillybun/vim-repl
+	" w: send line, visual selection
+	"       def, class, while, for, if (g:repl_auto_sends)
+	" r: start/stop console
+	nnoremap <leader>r :REPLToggle<Cr>
+	" e: hide console
+	nnoremap <leader>e :REPLHide<Cr>
+	" <C-w><C-w> switch between console and window
+	" <C-w><C-N> enter normal mode in console, i to return to insert mode
+	" s: send block # BEGIN ... # END
+	nnoremap <leader>s :REPLSendSession<Cr>
+	" d: send right hand side
+	nnoremap <leader>d :REPLSendRHSofCurrentLine<Cr>
+	let g:repl_console_name = 'REPLterm'
+	let g:repl_python_automerge = 1
+	let g:repl_code_block_fences = {'python': '# -', 'markdown': '```'}
+	let g:repl_code_block_fences_end = {'python': '# +', 'markdown': '```'}
+	let g:repl_program = { 'python': 'ipython3' , 'python-debug' : 'ipdb3' }
+	nnoremap <F12> <Esc>:REPLDebugStopAtCurrentLine<Cr>
+	nnoremap <F10> <Esc>:REPLPDBN<Cr>
+	nnoremap <F11> <Esc>:REPLPDBS<Cr>
+  let g:repl_predefine_python = { 'numpy': 'import numpy as np', 
+	 \ 'matplotlib': 'from matplotlib import pyplot as plt',
+	 \ 'logging' : 'import logging as log',
+	 \ 'log' : 'log.basicConfig(force=True, level=10)'
+	 \ }
+  if has('win32')
+    let g:repl_python_pre_launch_command="/OSGeo4W/bin/ipython-setup-qgis.bat"
+  endif
+endfunc
+au Filetype python call VimRepl()
+```
 
 # vim-repl
 
