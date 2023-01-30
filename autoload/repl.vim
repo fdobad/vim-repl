@@ -68,7 +68,13 @@ function! repl#StartWith(string, substring)
 endfunction
 
 function! repl#EndWith(string, substring)
-    return repl#StartWith(repl#ReverseStr(a:string), repl#ReverseStr(a:substring))
+    if strlen(a:string) < strlen(a:substring)
+        return 0
+    elseif a:string[(strlen(a:string)-strlen(a:substring)):strlen(a:string)] ==# a:substring
+        return 1
+    else
+        return 0
+    endif
 endfunction
 
 function! repl#EndWithAny(string, substringlist)
@@ -233,6 +239,7 @@ function! repl#REPLClose()
                 let l:temp_return = "\r"
             endif
             if exists('g:REPL_VIRTUAL_ENVIRONMENT')
+                " TODO test remove
                 call term_sendkeys(repl#GetConsoleName(), 'deactivate' . l:temp_return)
                 call term_wait(repl#GetConsoleName(), 50)
                 call term_sendkeys(repl#GetConsoleName(), repl#REPLGetExitCommand(repl#REPLGetShell()) . l:temp_return)
@@ -327,6 +334,8 @@ function! repl#REPLOpen(...)
                 endif
                 if repl#StartWith(g:REPL_VIRTUAL_ENVIRONMENT, "conda")
                     call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+                elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") &&  has('win32')
+                    call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
                 else
                     call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
                 endif
@@ -368,16 +377,20 @@ function! repl#REPLOpen(...)
             else
                 let l:temp_return = "\n"
             endif
-            if has('win32')
-                if repl#StartWith(g:repl_python_pre_launch_command, 'conda ')
-                    let g:REPL_VIRTUAL_ENVIRONMENT = repl#Strip(g:repl_python_pre_launch_command[strlen('conda '):])
-                endif
-            else
-                if repl#StartWith(g:repl_python_pre_launch_command, 'source ')
-                    let g:REPL_VIRTUAL_ENVIRONMENT = repl#Strip(g:repl_python_pre_launch_command[strlen('source '):])
-                endif
-            endif
-            call term_sendkeys(repl#GetConsoleName(), g:repl_python_pre_launch_command . l:temp_return)
+            let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
+            "if repl#StartWith( g:repl_python_pre_launch_command, "conda")
+            "elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") &&  has('win32')
+            "    let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
+            "elseif repl#StartWith(g:repl_python_pre_launch_command, 'source ')
+            "    let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
+            "else
+            "  echom "TODO"
+            "  call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+            "  call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+            "  call term_wait(repl#GetConsoleName(), 100)
+            "  call term_sendkeys(repl#GetConsoleName(), l:REPL_OPEN_TERMINAL . l:temp_return)
+            "endif
+            call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
             call term_wait(repl#GetConsoleName(), 100)
             call term_sendkeys(repl#GetConsoleName(), l:REPL_OPEN_TERMINAL . l:temp_return)
             return
