@@ -337,7 +337,7 @@ function! repl#REPLOpen(...)
                 elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") &&  has('win32')
                     call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
                 else
-                    call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+                    call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . '/bin/activate' . l:temp_return)
                 endif
                 call term_wait(repl#GetConsoleName(), 100)
                 call term_sendkeys(repl#GetConsoleName(), l:REPL_OPEN_TERMINAL . l:temp_return)
