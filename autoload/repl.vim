@@ -327,7 +327,7 @@ function! repl#REPLOpen(...)
                 endif
                 exe 'file ' . repl#GetConsoleName()
                 exe 'setlocal noswapfile'
-                exe 'setlocal nobuflisted'
+                "exe 'setlocal nobuflisted'
                 if has('win32')
                     let l:temp_return = "\r\n"
                 else
@@ -335,7 +335,7 @@ function! repl#REPLOpen(...)
                 endif
                 if repl#StartWith(g:REPL_VIRTUAL_ENVIRONMENT, "conda")
                     call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
-                elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") &&  has('win32')
+                elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") && has('win32')
                     call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
                 else
                     call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . '/bin/activate' . l:temp_return)
@@ -373,26 +373,28 @@ function! repl#REPLOpen(...)
             endif
             exe 'file ' . repl#GetConsoleName()
             exe 'setlocal noswapfile'
-            exe 'setlocal nobuflisted'
+            "exe 'setlocal nobuflisted'
             if has('win32')
                 let l:temp_return = "\r"
             else
                 let l:temp_return = "\n"
             endif
-            let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
-            "if repl#StartWith( g:repl_python_pre_launch_command, "conda")
-            "elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") &&  has('win32')
-            "    let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
-            "elseif repl#StartWith(g:repl_python_pre_launch_command, 'source ')
-            "    let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
-            "else
-            "  echom "TODO"
-            "  call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
-            "  call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
-            "  call term_wait(repl#GetConsoleName(), 100)
-            "  call term_sendkeys(repl#GetConsoleName(), l:REPL_OPEN_TERMINAL . l:temp_return)
-            "endif
-            call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+            " strip
+            let g:repl_python_pre_launch_command = repl#Strip(g:repl_python_pre_launch_command)
+            " starts with / path
+            if repl#StartWith(g:REPL_VIRTUAL_ENVIRONMENT, "conda")
+                let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
+                call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+            elseif repl#EndWith(g:REPL_VIRTUAL_ENVIRONMENT, ".bat") && has('win32')
+                let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
+                call term_sendkeys(repl#GetConsoleName(), g:REPL_VIRTUAL_ENVIRONMENT . l:temp_return)
+            else
+                let g:REPL_VIRTUAL_ENVIRONMENT = g:repl_python_pre_launch_command
+                call term_sendkeys(repl#GetConsoleName(), 'source ' . g:REPL_VIRTUAL_ENVIRONMENT . '/bin/activate' . l:temp_return)
+            "elif repl#StartWith( g:repl_python_pre_launch_command, "/")
+            "    echom "TODO call from calling file directory"
+            "    return
+            endif
             call term_wait(repl#GetConsoleName(), 100)
             call term_sendkeys(repl#GetConsoleName(), l:REPL_OPEN_TERMINAL . l:temp_return)
             return
