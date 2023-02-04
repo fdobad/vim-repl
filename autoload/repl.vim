@@ -327,6 +327,7 @@ function! repl#REPLOpen(...)
                 endif
                 exe 'file ' . repl#GetConsoleName()
                 exe 'setlocal noswapfile'
+                exe 'setlocal nobuflisted'
                 if has('win32')
                     let l:temp_return = "\r\n"
                 else
@@ -372,6 +373,7 @@ function! repl#REPLOpen(...)
             endif
             exe 'file ' . repl#GetConsoleName()
             exe 'setlocal noswapfile'
+            exe 'setlocal nobuflisted'
             if has('win32')
                 let l:temp_return = "\r"
             else
